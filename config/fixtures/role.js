@@ -5,8 +5,8 @@
  */
 exports.create = function () {
   return Promise.all([
-    sails.models.role.findOrCreate({ name: 'admin' }, { name: 'admin' }),
-    sails.models.role.findOrCreate({ name: 'registered' }, { name: 'registered' }),
-    sails.models.role.findOrCreate({ name: 'public' }, { name: 'public' })
+    Role.findOrCreate({ where: { name: 'admin' }, defaults: { name: 'admin' } }),
+    Role.findOrCreate({ where: { name: 'registered' }, defaults: { name: 'registered' } }),
+    Role.findOrCreate({ where: { name: 'public' }, defaults: { name: 'public' } })
   ]);
 };

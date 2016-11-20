@@ -9,15 +9,20 @@
  * A where clause uses waterline query syntax to determine if a permission is allowed, ie where: { id: { '>': 5 } }
  */
 module.exports = {
-  autoCreatedBy: false,
-
-  description: 'Specifies more granular limits on a permission',
-
   attributes: {
-    where: 'json',
-    blacklist: 'array',
-    permission: {
-        model: 'Permission'
-    }
+    where: Sequelize.JSON,
+    blacklist: Sequelize.ARRAY(Sequelize.TEXT)
+  },
+  associations: function() {
+    Criteria.belongsToMany(Permission, {
+      as: 'permission', foreignKey: 'permission'
+    });
+  },
+  options: {
+  	autoCreatedBy: false,
+    tableName: 'criteria',
+    classMethods: {},
+    instanceMethods: {},
+    hooks: {}
   }
 };

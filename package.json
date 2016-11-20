@@ -1,7 +1,7 @@
 {
-  "name": "sails-permissions",
-  "version": "2.2.0",
-  "description": "Comprehensive user permissions and entitlements system for sails.js and Waterline. Supports user authentication with passport.js, role-based permissioning, object ownership, and row-level security.",
+  "name": "sails-permissions-sequelize",
+  "version": "0.1.0",
+  "description": "Comprehensive user permissions and entitlements system for sails.js and Sequelize. Supports user authentication with passport.js, role-based permissioning, object ownership, and row-level security.",
   "main": "dist/api/hooks/permissions/index.js",
   "scripts": {
     "test": "gulp && mocha --reporter spec --compilers js:babel/register",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tjwebb/sails-permissions.git"
+    "url": "https://github.com/sglover/sails-permissions"
   },
   "keywords": [
     "sails",
@@ -30,12 +30,12 @@
     "trail",
     "tracking"
   ],
-  "author": "Travis Webb <me@traviswebb.com>",
+  "contributors": [ "Travis Webb <me@traviswebb.com>", "Steve Glover <steven.glover@gmail.com>" ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/tjwebb/sails-permissions/issues"
   },
-  "homepage": "https://github.com/tjwebb/sails-permissions",
+  "homepage": "https://github.com/sglover/sails-permissions",
   "devDependencies": {
     "babel": "^5.8.21",
     "gulp": "^3.9.0",
@@ -45,22 +45,21 @@
     "request": "^2.58.0",
     "sails": "balderdashy/sails",
     "sails-memory": "^0.10.5",
-    "supertest": "^0.15.0",
-    "waterline-postgresql": "^0.12.0"
+    "supertest": "^0.15.0"
   },
   "dependencies": {
     "fnv-plus": "^1.2.10",
     "lodash": "^3.10.0",
     "marlinspike": "^1.0",
     "pluralize": "^1.0.1",
-    "sails-auth": "^2.0",
     "sails-generate-entities": "latest",
-    "waterline-criteria": "^0.11.1"
+    "include-all": "^2.0.0",
+    "sequelize": "^3.24.8",
+    "sails-auth-sequelize": "^1.0.0",
+    "require-all": "^2.0.0"
   },
   "bundledDependencies": [
-    "fnv-plus",
-    "lodash",
-    "pluralize"
+
   ],
   "engines": {
     "node": ">= 0.10",

@@ -43,7 +43,6 @@ exports.create = function (roles, models, admin, config) {
     grantRegisteredPermissions(roles, models, admin, config)
   ])
   .then(function (permissions) {
-    //sails.log.verbose('created', permissions.length, 'permissions');
     return permissions;
   });
 };
@@ -60,7 +59,7 @@ function grantAdminPermissions (roles, models, admin, config) {
         action: permission.action,
         role: adminRole.id,
       };
-      return sails.models.permission.findOrCreate(newPermission, newPermission);
+      return Permission.findOrCreate(newPermission, newPermission);
     });
   }));
 
@@ -114,7 +113,7 @@ function grantRegisteredPermissions (roles, models, admin, config) {
 
   return Promise.all(
     [ ...basePermissions, ...grantPermissions ].map(permission => {
-      return sails.models.permission.findOrCreate(permission, permission);
+      return Permission.findOrCreate({where: permission, defaults: permission})
     })
   );
 }

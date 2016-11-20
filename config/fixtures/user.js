@@ -13,12 +13,13 @@ exports.create = function (roles, userModel) {
   if (_.isEmpty(sails.config.permissions.adminEmail)) {
     throw new Error('sails.config.permissions.adminEmail is not set');
   }
-  return sails.models.user.findOne({ username: sails.config.permissions.adminUsername })
+
+  return User.findOne({ where: { username: sails.config.permissions.adminUsername }})
     .then(function (user) {
       if (user) return user;
 
       sails.log.info('sails-permissions: admin user does not exist; creating...');
-      return sails.models.user.register({
+      return User.register({
         username: sails.config.permissions.adminUsername,
         password: sails.config.permissions.adminPassword,
         email: sails.config.permissions.adminEmail,

@@ -6,15 +6,29 @@
 */
 
 module.exports = {
-  autoPK: false,
-  autoUpdatedAt: false,
-  autoCreatedAt: false,
-
   attributes: {
-    request: {
-      model: 'RequestLog',
+    id: {
+      type: Sequelize.INTEGER,
       primaryKey: true
+    },
+    title: {
+      type: Sequelize.STRING
     }
+  },
+  associations: function() {
+    SecurityLog.belongsTo(RequestLog, {
+      as: 'request', foreignKey: 'id'
+    });
+  },
+  options: {
+  	autoCreatedBy: false,
+    autoPK: false,
+    createdAt: false,
+    updatedAt: false,
+    tableName: 'accesses',
+    classMethods: {},
+    instanceMethods: {},
+    hooks: {}
   }
 };
 

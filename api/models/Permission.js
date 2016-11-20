@@ -15,17 +15,8 @@ module.exports = {
   ].join(' '),
 
   attributes: {
-
-    /**
-     * The Model that this Permission applies to.
-     */
-    model: {
-      model: 'Model',
-      required: true
-    },
-
     action: {
-      type: 'string',
+      type: Sequelize.STRING,
       index: true,
       notNull: true,
       /**
@@ -41,7 +32,7 @@ module.exports = {
     },
 
     relation: {
-      type: 'string',
+      type: Sequelize.STRING,
       enum: [
         'role',
         'owner',
@@ -49,35 +40,51 @@ module.exports = {
       ],
       defaultsTo: 'role',
       index: true
-    },
+    }
+  },
+
+  associations: function() {
+    /**
+     * The Model that this Permission applies to.
+     */
+    Permission.belongsTo(Model, {
+      as: 'model', foreignKey: 'model'
+    });
 
     /**
      * The Role to which this Permission grants create, read, update, and/or
      * delete privileges.
      */
-    role: {
-      model: 'Role',
-      // Validate manually
-      //required: true
-    },
+    Permission.belongsTo(Role, {
+      as: 'role', foreignKey: 'role'
+    });
 
     /**
      * The User to which this Permission grants create, read, update, and/or
      * delete privileges.
      */
-    user: {
-      model: 'User'
-      // Validate manually
-    },
+    Permission.belongsTo(User, {
+      as: 'user', foreignKey: 'user'
+    });
 
     /**
      * A list of criteria.  If any of the criteria match the request, the action is allowed.
      * If no criteria are specified, it is ignored altogether.
      */
-    criteria: {
-      collection: 'Criteria',
-      via: 'permission'
-    }
+    Permission.hasMany(Criteria, {
+      as: 'criteria', foreignKey: 'permission'
+    });
+  },
+
+  options: {
+    autoCreatedBy: false,    
+    autoPK: true,
+    createdAt: false,
+    updatedAt: false,
+    tableName: 'permission',
+    classMethods: {},
+    instanceMethods: {},
+    hooks: {}
   },
 
   afterValidate: [

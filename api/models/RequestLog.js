@@ -6,34 +6,43 @@
 */
 
 module.exports = {
-  autoPK: false,
-  autoCreatedBy: false,
-  autoUpdatedAt: false,
-
   attributes: {
     id: {
-      type: 'string',
+      type: Sequelize.STRING,
       primaryKey: true
     },
     ipAddress: {
-      type: 'string'
+      type: Sequelize.STRING
     },
     method: {
-      type: 'string'
+      type: Sequelize.STRING
     },
     url: {
-      type: 'string',
+      type: Sequelize.STRING,
       url: true
     },
     body: {
-      type: 'json'
-    },
-    user: {
-      model: 'User'
+      type: Sequelize.JSON
     },
     model: {
-      type: 'string'
+      type: Sequelize.STRING
     }
+  },
+  associations: function() {
+    RequestLog.belongsTo(User, {
+      as: 'user', foreignKey: 'user'
+    });
+  },
+
+  options: {
+    autoCreatedBy: false,
+    autoPK: false,
+    createdAt: false,
+    updatedAt: false,
+    tableName: 'requestlog',
+    classMethods: {},
+    instanceMethods: {},
+    hooks: {}
   }
 };
 

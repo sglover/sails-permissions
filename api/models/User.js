@@ -1,18 +1,31 @@
 var _ = require('lodash');
-var _super = require('sails-auth/api/models/User');
+var _super = require('sails-auth-sequelize/api/models/User');
 
 _.merge(exports, _super);
 _.merge(exports, {
   attributes: {
-    roles: {
-      collection: 'Role',
-      via: 'users',
-      dominant: true
-    },
-    permissions: {
-      collection: "Permission",
-      via: "user"
-    }
+  },
+
+  associations: function() {
+    User.belongsToMany(Role, {
+      through: {
+        model: UserRole,
+        unique: false,
+      },
+      as: 'roles',
+      foreignKey: 'user_id',
+      otherKey: 'role_id'
+    });
+  },
+
+  options: {
+    autoCreatedBy: false,
+    tableName: 'users',
+    createdAt: false,
+    updatedAt: false,
+    classMethods: {},
+    instanceMethods: {},
+    hooks: {}
   },
 
   /**
@@ -33,11 +46,13 @@ _.merge(exports, {
     },
     function attachDefaultRole (user, next) {
       sails.log('User.afterCreate.attachDefaultRole', user);
-      User.findOne(user.id)
-        .populate('roles')
+      User.findOne({
+          where: { id: user.id },
+          include: [{ model: Role, as: 'roles' }]
         .then(function (_user) {
           user = _user;
-          return Role.findOne({ name: 'registered' });
+          // return Role.findOne({ name: 'registered' });
+          return Role.findOne({ where: { name: 'registered' } });
         })
         .then(function (role) {
           user.roles.add(role.id);
@@ -51,6 +66,7 @@ _.merge(exports, {
           sails.log.error(e);
           next(e);
         })
+      });
     }
   ]
 });

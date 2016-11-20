@@ -8,29 +8,33 @@
  * @see <http://www.postgresql.org/docs/9.3/static/sql-grant.html>
  */
 module.exports = {
-  autoCreatedBy: false,
-
-  description: 'Confers `Permission` to `User`',
-
   attributes: {
     name: {
-      type: 'string',
+      type: Sequelize.STRING,
       index: true,
       notNull: true,
       unique: true
     },
-    users: {
-      collection: 'User',
-      via: 'roles'
-    },
     active: {
-      type: 'boolean',
+      type: Sequelize.BOOLEAN,
       defaultsTo: true,
       index: true
-    },
-    permissions: {
-      collection: 'Permission',
-      via: 'role'
     }
+    // permissions: {
+    //   collection: 'Permission',
+    //   via: 'role'
+    // }
+  },
+  associations: function() {
+  },
+  options: {
+    autoPK: true,
+    autoCreatedBy: false,
+    createdAt: false,
+    updatedAt: false,
+    tableName: 'role',
+    classMethods: {},
+    instanceMethods: {},
+    hooks: {}
   }
 };

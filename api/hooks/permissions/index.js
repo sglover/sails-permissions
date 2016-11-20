@@ -6,9 +6,14 @@ var permissionPolicies = [
   'PermissionPolicy',
   'RolePolicy'
 ]
+import * as fs from 'fs'
 import path from 'path'
 import _ from 'lodash'
 import Marlinspike from 'marlinspike'
+import * as includeAll from 'include-all'
+import requireAll from 'require-all'
+import sequelize from 'sequelize'
+import util from 'util'
 
 class Permissions extends Marlinspike {
   constructor (sails) {
@@ -42,8 +47,11 @@ class Permissions extends Marlinspike {
 
     })
 
-    this.sails.after('hook:orm:loaded', () => {
-      sails.models.model.count()
+    this.sails.after('hook:sequelize:loaded', () => {
+
+      this.bindModels()
+
+      Model.count()
         .then(count => {
           if (count === _.keys(this.sails.models).length) return next()
 
@@ -70,21 +78,51 @@ class Permissions extends Marlinspike {
 
   installModelOwnership () {
     var models = this.sails.models
-    if (this.sails.config.models.autoCreatedBy === false) return
-
-    _.each(models, model => {
-      if (model.autoCreatedBy === false) return
-
-      _.defaults(model.attributes, {
-        createdBy: {
-          model: 'User',
-          index: true
-        },
-        owner: {
-          model: 'User',
-          index: true
+    if (this.sails.config.models.autoCreatedBy === true) {
+      _.each(models, model => {
+        if (model.options.autoCreatedBy === true) {
+          _.defaults(model.attributes, {
+            createdBy: {
+              model: 'User',
+              index: true
+            },
+            owner: {
+              model: 'User',
+              index: true
+            }
+          })
         }
       })
+    }
+  }
+
+  // override
+  loadModels () {
+    this.sails.log.debug(`marlinspike (${this.name}): loading Models...`)
+    try {
+      let models = requireAll({
+        dirname: path.resolve(this.hookPath, '../../models'),
+        filter: /(.+)\.js$/
+      })
+      this.mergeEntities('models', models)
+      this.models = _.merge(this.models || { }, Marlinspike.transformEntities(models))
+    }
+    catch (e) {
+      this.sails.log.debug(e)
+      this.sails.log.warn(`marlinspike (${this.name}): no Models found. skipping`)
+    }
+  }
+
+  /*
+   * bind the models into Sequelize
+   */
+  bindModels() {
+    const models = this.models
+
+    _.keys(models).forEach(function(key) {
+      sails.log.verbose('model=' + key)
+      const model = models[key]
+      global[model.globalId] = global['sequelize'].define(model.globalId, model.attributes, model.options)
     })
   }
 
@@ -94,7 +132,8 @@ class Permissions extends Marlinspike {
   */
   initializeFixtures () {
     let fixturesPath = path.resolve(__dirname, '../../../config/fixtures/')
-    return require(path.resolve(fixturesPath, 'model')).createModels()
+    return require(path.resolve(fixturesPath, 'model'))
+      .createModels()
       .then(models => {
         this.models = models
         this.sails.hooks.permissions._modelCache = _.indexBy(models, 'identity')

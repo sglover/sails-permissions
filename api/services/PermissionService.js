@@ -83,19 +83,20 @@ module.exports = {
     //console.log('findModelPermissions options', options)
     //console.log('findModelPermissions action', action)
 
-    return User.findOne(options.user.id)
-      .populate('roles')
+    return User.findOne({ where: { id: options.user.id }, include: [ 'roles' ]})
       .then(function(user) {
-        var permissionCriteria = {
-          model: options.model.id,
-          action: action,
-          or: [
-            { role: _.pluck(user.roles, 'id') },
-            { user: user.id }
-          ]
+        var permissionCriteria = { where:
+          {
+            model: options.model.id,
+            action: action,
+            or: [
+              { role: _.pluck(user.roles, 'id') },
+              { user: user.id }
+            ]
+          }
         };
         
-        return Permission.find(permissionCriteria).populate('criteria')
+        return Permission.find({permissionCriteria, include : ['criteria']})
       });
   },
 
@@ -221,9 +222,9 @@ module.exports = {
     // look up the model id based on the model name for each permission, and change it to an id
     ok = ok.then(function() {
       return Promise.all(permissions.map(function(permission) {
-        return Model.findOne({
+        return Model.findOne({ where: {
             name: permission.model
-          })
+          }})
           .then(function(model) {
             permission.model = model.id;
             return permission;
@@ -234,9 +235,9 @@ module.exports = {
     // look up user ids based on usernames, and replace the names with ids
     ok = ok.then(function(permissions) {
       if (options.users) {
-        return User.find({
+        return User.find({ where: {
             username: options.users
-          })
+          }})
           .then(function(users) {
             options.users = users;
           });
@@ -270,15 +271,15 @@ module.exports = {
 
     // look up the models based on name, and replace them with ids
     var ok = Promise.all(permissions.map(function(permission) {
-      var findRole = permission.role ? Role.findOne({
+      var findRole = permission.role ? Role.findOne({ where : {
         name: permission.role
-      }) : null;
-      var findUser = permission.user ? User.findOne({
+      }}) : null;
+      var findUser = permission.user ? User.findOne({ where : {
         username: permission.user
-      }) : null;
-      return Promise.all([findRole, findUser, Model.findOne({
+      }}) : null;
+      return Promise.all([findRole, findUser, Model.findOne({ where : {
           name: permission.model
-        })])
+        }})])
         .then(([ role, user, model]) => {
           permission.model = model.id;
           if (role && role.id) {
@@ -313,15 +314,21 @@ module.exports = {
       usernames = [usernames];
     }
 
-    return Role.findOne({
-      name: rolename
-    }).populate('users').then(function(role) {
-      return User.find({
-        username: usernames
-      }).then(function(users) {
-        role.users.add(_.pluck(users, 'id'));
-        return role.save();
-      });
+    return Role
+      .findOne({ where: {
+        name: rolename
+      },
+      include: ['users' ]
+    })
+    .then(function(role) {
+      return User
+        .find({ where : {
+          username: usernames
+        }})
+        .then(function(users) {
+          role.users.add(_.pluck(users, 'id'));
+          return role.save();
+        });
     });
   },
 
@@ -340,21 +347,25 @@ module.exports = {
       usernames = [usernames];
     }
 
-    return Role.findOne({
-        name: rolename
+    return Role
+      .findOne({
+        where: {
+          name: rolename
+        },
+        include: [ 'users' ]
       })
-      .populate('users')
       .then(function(role) {
-        return User.find({
-          username: usernames
-        }, {
-          select: ['id']
-        }).then(function(users) {
-          users.map(function(user) {
-            role.users.remove(user.id);
-          });
-          return role.save();
+        return User
+          .find({ where: {
+            username: usernames
+          }, attributes: ['id']
+          })
+      })
+      .then(function(users) {
+        users.map(function(user) {
+          role.users.remove(user.id);
         });
+        return role.save();
       });
   },
 
@@ -368,15 +379,9 @@ module.exports = {
    * @param options.relation {string} - the type of the relation (owner or role)
    */
   revoke: function(options) {
-    var findRole = options.role ? Role.findOne({
-      name: options.role
-    }) : null;
-    var findUser = options.user ? User.findOne({
-      username: options.user
-    }) : null;
-    var ok = Promise.all([findRole, findUser, Model.findOne({
-      name: options.model
-    })]);
+    var findRole = options.role ? Role.findOne({ where: { name: options.role }}) : null;
+    var findUser = options.user ? User.findOne({ where: { username: options.user }}) : null;
+    var ok = Promise.all([findRole, findUser, Model.findOne({ where: { name: options.model }})]);
 
     ok = ok.then(([ role, user, model ]) => {
 
@@ -394,6 +399,7 @@ module.exports = {
         return Promise.reject(new Error('You must provide either a user or role to revoke the permission from'));
       }
 
+      // TODO
       return Permission.destroy(query);
     });
 
@@ -432,22 +438,28 @@ module.exports = {
   isAllowedToPerformSingle: function(user, action, model, body) {
     return function(obj) {
       return new Promise(function(resolve, reject) {
-        Model.findOne({
-          identity: model
-        }).then(function(model) {
-         return Permission.find({
-            model: model.id,
-            action: action,
-            relation: 'user',
-            user: user
-          }).populate('criteria');
-        }).then(function(permission) {
-          if (permission.length > 0 && PermissionService.hasPassingCriteria(obj, permission, body)) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        }).catch(reject);
+        Model
+          .findOne({ where: {
+            identity: model
+          }})
+          .then(function(model) {
+            return Permission
+              .find({ where: {
+                model: model.id,
+                action: action,
+                relation: 'user',
+                user: user
+              },
+              include: [ 'criteria' ]
+            })
+          })
+          .then(function(permission) {
+            if (permission.length > 0 && PermissionService.hasPassingCriteria(obj, permission, body)) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          }).catch(reject);
       });
     };
   }

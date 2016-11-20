@@ -5,8 +5,7 @@
  */
 import _ from 'lodash'
 exports.createModels = function () {
-  sails.log.verbose('sails-permissions: syncing waterline models');
-
+  // for every model defined in the app, make sure there is a row in the models table for it
   var models = _.compact(_.map(sails.models, function (model, name) {
     return model && model.globalId && model.identity && {
       name: model.globalId,
@@ -16,6 +15,6 @@ exports.createModels = function () {
   }));
 
   return Promise.all(_.map(models, function (model) {
-    return sails.models.model.findOrCreate({ name: model.name }, model);
+    return Model.findOrCreate({where: { name: model.name }, defaults: model})
   }));
 };
