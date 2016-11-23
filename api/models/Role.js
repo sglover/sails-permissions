@@ -32,7 +32,7 @@ module.exports = {
     autoCreatedBy: false,
     createdAt: false,
     updatedAt: false,
-    tableName: 'role',
+    tableName: 'roles',
     classMethods: {},
     instanceMethods: {},
     hooks: {}
