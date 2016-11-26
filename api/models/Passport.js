@@ -1,11 +1,11 @@
 
 var _ = require('lodash');
-var _super = require('sails-auth/api/models/Passport');
+var _super = require('sails-auth-sequelize/api/models/Passport');
 
 _.merge(exports, _super);
 _.merge(exports, {
 
-  autoCreatedBy: false
+  // autoCreatedBy: false
 
   // Extend with custom logic here by adding additional fields, methods, etc.
 

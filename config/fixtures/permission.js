@@ -37,17 +37,17 @@ var modelRestrictions = {
 /**
  * Create default Role permissions
  */
-exports.create = function (roles, models, admin, config) {
+exports.create = function (roles, models, config) {
   return Promise.all([
-    grantAdminPermissions(roles, models, admin, config),
-    grantRegisteredPermissions(roles, models, admin, config)
+    grantAdminPermissions(roles, models, config),
+    grantRegisteredPermissions(roles, models, config)
   ])
   .then(function (permissions) {
     return permissions;
   });
 };
 
-function grantAdminPermissions (roles, models, admin, config) {
+function grantAdminPermissions (roles, models, config) {
   var adminRole = _.find(roles, { name: 'admin' });
   var permissions = _.flatten(_.map(models, function (modelEntity) {
     //var model = sails.models[modelEntity.identity];
@@ -59,14 +59,14 @@ function grantAdminPermissions (roles, models, admin, config) {
         action: permission.action,
         role: adminRole.id,
       };
-      return Permission.findOrCreate(newPermission, newPermission);
+      return Permission.findOrCreate({ where: newPermission, default: newPermission });
     });
   }));
 
   return Promise.all(permissions);
 }
 
-function grantRegisteredPermissions (roles, models, admin, config) {
+function grantRegisteredPermissions (roles, models, config) {
   var registeredRole = _.find(roles, { name: 'registered' });
   var basePermissions = [
     {

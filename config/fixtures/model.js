@@ -15,6 +15,6 @@ exports.createModels = function () {
   }));
 
   return Promise.all(_.map(models, function (model) {
-    return Model.findOrCreate({where: { name: model.name }, defaults: model})
+    return Model.findOrCreate({where: { name: model.name }, defaults: model}).spread((model, created) => model);
   }));
 };

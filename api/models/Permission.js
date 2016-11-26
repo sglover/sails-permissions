@@ -48,7 +48,7 @@ module.exports = {
      * The Model that this Permission applies to.
      */
     Permission.belongsTo(Model, {
-      as: 'model', foreignKey: 'model'
+      as: 'model', foreignKey: 'id'
     });
 
     /**
@@ -56,7 +56,7 @@ module.exports = {
      * delete privileges.
      */
     Permission.belongsTo(Role, {
-      as: 'role', foreignKey: 'role'
+      as: 'role', foreignKey: 'id'
     });
 
     /**
@@ -64,7 +64,7 @@ module.exports = {
      * delete privileges.
      */
     Permission.belongsTo(User, {
-      as: 'user', foreignKey: 'user'
+      as: 'user', foreignKey: 'id'
     });
 
     /**

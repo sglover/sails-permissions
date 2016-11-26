@@ -33,7 +33,7 @@ class Permissions extends Marlinspike {
     let config = this.sails.config.permissions
 
     this.installModelOwnership()
-    this.sails.after(config.afterEvent, () => {
+    this.sails.after(config.afterEvents, () => {
       if (!this.validateDependencies()) {
         this.sails.log.error('Cannot find sails-auth hook. Did you "npm install sails-auth --save"?')
         this.sails.log.error('Please see README for installation instructions: https://github.com/tjwebb/sails-permissions')
@@ -45,26 +45,24 @@ class Permissions extends Marlinspike {
         this.sails.log.warn('Please see README for installation instructions: https://github.com/tjwebb/sails-permissions')
       }
 
-    })
+      this.sails.after('hook:sequelize:initialized', () => {
+        this.bindModels()
 
-    this.sails.after('hook:sequelize:loaded', () => {
+        Model.count()
+          .then(count => {
+            if (count === _.keys(this.sails.models).length) return next()
 
-      this.bindModels()
-
-      Model.count()
-        .then(count => {
-          if (count === _.keys(this.sails.models).length) return next()
-
-          return this.initializeFixtures()
-            .then(() => {
-              next()
-            })
-        })
-        .catch(error => {
-          this.sails.log.error(error)
-          next(error)
-        })
-    })
+            return this.initializeFixtures()
+              .then(() => {
+                next()
+              })
+          })
+          .catch(error => {
+            this.sails.log.error(error)
+            next(error)
+          })
+      });
+    });
   }
 
   validatePolicyConfig () {
@@ -135,23 +133,16 @@ class Permissions extends Marlinspike {
     return require(path.resolve(fixturesPath, 'model'))
       .createModels()
       .then(models => {
-        this.models = models.map(model => return model[0]);
+        this.models = models;
         this.sails.hooks.permissions._modelCache = _.indexBy(models, 'identity')
 
         return require(path.resolve(fixturesPath, 'role')).create()
       }).then(roles => {
-        this.roles = roles.map(role => return x[0]);
+        this.roles = roles;
         var userModel = _.find(this.models, { name: 'User' });
         return require(path.resolve(fixturesPath, 'user')).create(this.roles, userModel)
-      }).then(() => {
-        return sails.models.user.findOne({ email: this.sails.config.permissions.adminEmail })
-      }).then(user => {
-        this.sails.log('sails-permissions: created admin user:', user)
-        user.createdBy = user.id
-        user.owner = user.id
-        return user.save()
       }).then(admin => {
-        return require(path.resolve(fixturesPath, 'permission')).create(this.roles, this.models, admin, this.sails.config.permissions);
+        return require(path.resolve(fixturesPath, 'permission')).create(this.roles, this.models, this.sails.config.permissions);
       }).catch(error => {
         this.sails.log.error(error)
       })
