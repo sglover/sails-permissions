@@ -15,6 +15,12 @@ module.exports = {
   ].join(' '),
 
   attributes: {
+    id: {
+      type: Sequelize.INTEGER,
+      field: 'id',
+      primaryKey: true,
+      autoIncrement: true
+    },
     action: {
       type: Sequelize.STRING,
       index: true,
