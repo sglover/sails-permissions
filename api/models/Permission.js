@@ -85,8 +85,8 @@ module.exports = {
   options: {
     autoCreatedBy: false,    
     autoPK: true,
-    createdAt: false,
-    updatedAt: false,
+    createdAt: true,
+    updatedAt: true,
     tableName: 'permission',
     classMethods: {},
     instanceMethods: {},
