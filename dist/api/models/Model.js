@@ -8,6 +8,12 @@
 
 module.exports = {
   attributes: {
+    id: {
+      type: Sequelize.INTEGER,
+      field: 'id',
+      primaryKey: true,
+      autoIncrement: true
+    },
     name: {
       type: Sequelize.STRING,
       notNull: true,

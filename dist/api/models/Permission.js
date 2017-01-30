@@ -18,6 +18,12 @@ module.exports = {
   description: ['Defines a particular `action` that a `Role` can perform on a `Model`.', 'A `User` can perform an `action` on a `Model` by having a `Role` which', 'grants the necessary `Permission`.'].join(' '),
 
   attributes: {
+    id: {
+      type: Sequelize.INTEGER,
+      field: 'id',
+      primaryKey: true,
+      autoIncrement: true
+    },
     action: {
       type: Sequelize.STRING,
       index: true,
@@ -73,8 +79,8 @@ module.exports = {
   options: {
     autoCreatedBy: false,
     autoPK: true,
-    createdAt: false,
-    updatedAt: false,
+    createdAt: true,
+    updatedAt: true,
     tableName: 'permission',
     classMethods: {},
     instanceMethods: {},

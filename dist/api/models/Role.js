@@ -11,6 +11,12 @@
 
 module.exports = {
   attributes: {
+    id: {
+      type: Sequelize.INTEGER,
+      field: 'id',
+      primaryKey: true,
+      autoIncrement: true
+    },
     name: {
       type: Sequelize.STRING,
       index: true,
@@ -22,10 +28,6 @@ module.exports = {
       defaultsTo: true,
       index: true
     }
-    // permissions: {
-    //   collection: 'Permission',
-    //   via: 'role'
-    // }
   },
   associations: function associations() {},
   options: {

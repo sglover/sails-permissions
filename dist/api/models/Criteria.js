@@ -12,6 +12,12 @@
 
 module.exports = {
   attributes: {
+    id: {
+      type: Sequelize.INTEGER,
+      field: 'id',
+      primaryKey: true,
+      autoIncrement: true
+    },
     where: Sequelize.JSON,
     blacklist: Sequelize.ARRAY(Sequelize.TEXT)
   },
