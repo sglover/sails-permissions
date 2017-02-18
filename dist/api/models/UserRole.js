@@ -9,6 +9,12 @@
 
 module.exports = {
   attributes: {
+    id: {
+      type: Sequelize.INTEGER,
+      field: 'id',
+      primaryKey: true,
+      autoIncrement: true
+    },
     user_id: {
       type: Sequelize.INTEGER
     },
