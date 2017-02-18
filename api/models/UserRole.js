@@ -29,6 +29,7 @@ module.exports = {
     tableName: 'users_roles',
     createdAt: false,
     updatedAt: false,
+    autoPK: true,
     classMethods: {},
     instanceMethods: {},
     hooks: {}
