@@ -1,6 +1,6 @@
 {
   "name": "sails-permissions-sequelize",
-  "version": "0.1.1",
+  "version": "1.0.1",
   "description": "Comprehensive user permissions and entitlements system for sails.js and Sequelize. Supports user authentication with passport.js, role-based permissioning, object ownership, and row-level security.",
   "main": "dist/api/hooks/permissions/index.js",
   "scripts": {

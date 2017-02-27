@@ -25,6 +25,14 @@ module.exports = {
       type: Sequelize.BOOLEAN,
       defaultsTo: true,
       index: true
+    },
+    resource_type: {
+      type: Sequelize.STRING,
+      index: true
+    },
+    resource_id: {
+      type: Sequelize.INTEGER,
+      index: true
     }
   },
   associations: function() {
