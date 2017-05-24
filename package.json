@@ -55,7 +55,7 @@
     "sails-generate-entities": "latest",
     "include-all": "^2.0.0",
     "sequelize": "^3.24.8",
-    "sails-auth-sequelize": "git://github.com/sglover/sails-auth.git#e0004380aad81aa334305425e6b4510c78a8bb2d",
+    "sails-auth-sequelize": "git://github.com/sglover/sails-auth.git#ebda8c1a5345fe3bc476ae81152d0d180456ae72",
     "require-all": "^2.0.0"
   },
   "bundledDependencies": [
